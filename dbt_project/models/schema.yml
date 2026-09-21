@@ -1,0 +1,24 @@
+version: 2
+
+sources:
+  - name: silver_layer
+    schema: silver
+    tables:
+      - name: silver_customers
+      - name: silver_services
+      - name: silver_pos_locations
+      - name: silver_revenue
+      - name: silver_delivery
+
+models:
+  - name: dim_customer
+    description: "Dimension Khách hàng"
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+  - name: dim_service
+  - name: dim_pos_location
+  - name: fact_revenue
+  - name: fact_delivery_remuneration

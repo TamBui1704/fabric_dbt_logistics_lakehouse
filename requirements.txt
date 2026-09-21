@@ -1,0 +1,4 @@
+dbt-fabric>=1.8.0
+pyspark>=3.4.0
+azure-identity>=1.16.0
+apache-airflow-providers-microsoft-fabric>=1.0.0

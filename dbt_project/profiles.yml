@@ -1,0 +1,17 @@
+logistics_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: fabric
+      driver: "ODBC Driver 18 for SQL Server"
+      server: "{{ env_var('FABRIC_SERVER', 'your-server.datawarehouse.fabric.microsoft.com') }}"
+      port: 1433
+      database: "{{ env_var('FABRIC_DATABASE', 'your_lakehouse_name') }}"
+      schema: gold
+      authentication: "ActiveDirectoryServicePrincipal"
+      tenant_id: "{{ env_var('FABRIC_TENANT_ID', '') }}"
+      client_id: "{{ env_var('FABRIC_CLIENT_ID', '') }}"
+      client_secret: "{{ env_var('FABRIC_CLIENT_SECRET', '') }}"
+      threads: 4
+      timeout_seconds: 300
+      retries: 1
