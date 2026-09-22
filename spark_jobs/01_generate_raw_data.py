@@ -12,8 +12,6 @@ def main():
     
     bronze_lakehouse = "lh_bronze"
     
-    # Ensure database/schema exists in Spark catalog
-    spark.sql(f"CREATE DATABASE IF NOT EXISTS {bronze_lakehouse}")
     print(f"Target Bronze Lakehouse Catalog: '{bronze_lakehouse}'")
 
     print("Generating Dimensions...")
@@ -25,9 +23,9 @@ def main():
     df_services = spark.createDataFrame(service_data, ["service_id", "service_name", "service_group"])
     df_pos = spark.createDataFrame(pos_data, ["pos_id", "pos_name", "province", "region"])
 
-    df_customers.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{bronze_lakehouse}.bronze_customers")
-    df_services.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{bronze_lakehouse}.bronze_services")
-    df_pos.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{bronze_lakehouse}.bronze_pos_locations")
+    df_customers.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{bronze_lakehouse}.dbo.bronze_customers")
+    df_services.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{bronze_lakehouse}.dbo.bronze_services")
+    df_pos.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{bronze_lakehouse}.dbo.bronze_pos_locations")
 
     print("Generating ~10M Fact records with realistic parallel distribution...")
     df_days = spark.range(990).withColumn("created_at_date", expr("date_add(cast('2024-01-01' as date), cast(id as int))"))
@@ -72,9 +70,12 @@ def main():
         .withColumn("delivery_fee", when(col("dest_pos_id").like("POS_HN%"), 10000).when(col("dest_pos_id").like("POS_HCM%"), 12000).otherwise(15000).cast("decimal(18,2)")) \
         .select("shipment_id", col("dest_pos_id").alias("delivery_pos_id"), "service_id", "delivery_fee", "delivered_at")
 
-    print("Saving to Bronze Delta tables with Fabric V-Order & Optimize Write...")
-    df_revenue.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{bronze_lakehouse}.bronze_revenue")
-    df_delivery.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{bronze_lakehouse}.bronze_delivery")
+    df_revenue = df_revenue.withColumn("partition_ym", expr("date_format(created_at, 'yyyy-MM')"))
+    df_delivery = df_delivery.withColumn("partition_ym", expr("date_format(delivered_at, 'yyyy-MM')"))
+
+    print("Saving to Bronze Delta tables with Fabric V-Order & Optimize Write (Partitioned by Month)...")
+    df_revenue.write.format("delta").mode("overwrite").option("overwriteSchema", "true").partitionBy("partition_ym").saveAsTable(f"{bronze_lakehouse}.dbo.bronze_revenue")
+    df_delivery.write.format("delta").mode("overwrite").option("overwriteSchema", "true").partitionBy("partition_ym").saveAsTable(f"{bronze_lakehouse}.dbo.bronze_delivery")
     print("Done generating Bronze layer!")
 
 if __name__ == "__main__":

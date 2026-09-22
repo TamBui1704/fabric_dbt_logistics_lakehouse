@@ -44,7 +44,7 @@ with DAG(
     dbt_project_dir = "/opt/airflow/dags/repo/dbt_project" # Đường dẫn thực tế tùy môi trường
     run_dbt_gold = BashOperator(
         task_id="run_dbt_silver_to_gold",
-        bash_command=f"cd {dbt_project_dir} && dbt build --profiles-dir .",
+        bash_command=f"cd {dbt_project_dir} && dbt build --target prod --profiles-dir .",
     )
 
     run_bronze_job >> run_silver_job >> run_dbt_gold

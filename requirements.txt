@@ -1,4 +1,9 @@
-dbt-fabric>=1.8.0
+# --- Core dbt & Microsoft Fabric Adapter (Dùng để chạy dbt ở local & CI/CD) ---
+dbt-fabric==1.9.9
+
+# --- Spark Exploration (Tùy chọn nếu test code PySpark ở local) ---
 pyspark>=3.4.0
-azure-identity>=1.16.0
+
+# --- Airflow Orchestration (Cài đặt trong container/server chạy Airflow) ---
+# Lưu ý: Trên Windows local không nên cài trực tiếp gói này vì Airflow yêu cầu môi trường Linux/WSL/Docker
 apache-airflow-providers-microsoft-fabric>=1.0.0

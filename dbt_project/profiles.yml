@@ -1,17 +1,27 @@
 logistics_dbt:
-  target: dev
+  target: dev   # Ở local mặc định chạy target 'dev'
   outputs:
+    # 1. DÀNH CHO LOCAL: Dùng chính tài khoản cá nhân qua Azure CLI
     dev:
       type: fabric
       driver: "ODBC Driver 18 for SQL Server"
-      server: "{{ env_var('FABRIC_SERVER', 'your-server.datawarehouse.fabric.microsoft.com') }}"
+      server: "{{ env_var('FABRIC_SERVER') }}"
       port: 1433
-      database: "{{ env_var('FABRIC_DATABASE', 'your_lakehouse_name') }}"
-      schema: gold
-      authentication: "ActiveDirectoryServicePrincipal"
-      tenant_id: "{{ env_var('FABRIC_TENANT_ID', '') }}"
-      client_id: "{{ env_var('FABRIC_CLIENT_ID', '') }}"
-      client_secret: "{{ env_var('FABRIC_CLIENT_SECRET', '') }}"
+      database: "{{ env_var('FABRIC_DATABASE', 'wh_gold') }}"
+      schema: "{{ env_var('FABRIC_SCHEMA', 'dbo') }}"
+      authentication: CLI
       threads: 4
-      timeout_seconds: 300
-      retries: 1
+
+    # 2. DÀNH CHO AIRFLOW: Dùng Service Principal tự động
+    prod:
+      type: fabric
+      driver: "ODBC Driver 18 for SQL Server"
+      server: "{{ env_var('FABRIC_SERVER') }}"
+      port: 1433
+      database: "{{ env_var('FABRIC_DATABASE', 'wh_gold') }}"
+      schema: "{{ env_var('FABRIC_SCHEMA', 'dbo') }}"
+      authentication: ActiveDirectoryServicePrincipal
+      tenant_id: "{{ env_var('FABRIC_TENANT_ID') }}"
+      client_id: "{{ env_var('FABRIC_CLIENT_ID') }}"
+      client_secret: "{{ env_var('FABRIC_CLIENT_SECRET') }}"
+      threads: 4

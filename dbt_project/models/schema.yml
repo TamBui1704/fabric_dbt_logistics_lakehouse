@@ -2,23 +2,90 @@ version: 2
 
 sources:
   - name: silver_layer
-    schema: silver
+    database: "{{ env_var('FABRIC_SILVER_DATABASE', 'lh_silver') }}"
+    schema: "{{ env_var('FABRIC_SILVER_SCHEMA', 'dbo') }}"
+    description: "Nguồn dữ liệu sạch tầng Silver được ghi bởi Spark Job vào Lakehouse lh_silver"
     tables:
       - name: silver_customers
+        description: "Bảng dữ liệu khách hàng sạch tầng Silver"
       - name: silver_services
+        description: "Bảng dữ liệu dịch vụ sạch tầng Silver"
       - name: silver_pos_locations
+        description: "Bảng dữ liệu bưu cục sạch tầng Silver"
       - name: silver_revenue
+        description: "Bảng dữ liệu doanh thu đơn hàng chi tiết tầng Silver"
       - name: silver_delivery
+        description: "Bảng dữ liệu thù lao công phát chi tiết tầng Silver"
 
 models:
   - name: dim_customer
-    description: "Dimension Khách hàng"
+    description: "Dimension Khách hàng (SCD Type 1)"
     columns:
       - name: customer_id
+        description: "Khóa chính của khách hàng"
         tests:
           - unique
           - not_null
+
   - name: dim_service
+    description: "Dimension Dịch vụ vận chuyển"
+    columns:
+      - name: service_id
+        description: "Mã dịch vụ"
+        tests:
+          - unique
+          - not_null
+
   - name: dim_pos_location
+    description: "Dimension Điểm bưu cục (POS Location)"
+    columns:
+      - name: pos_id
+        description: "Mã định danh bưu cục"
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_date
+    description: "Dimension Thời gian (Date Dimension)"
+    columns:
+      - name: date_id
+        description: "Khóa ngày tháng"
+        tests:
+          - unique
+          - not_null
+
   - name: fact_revenue
+    description: "Fact Table Doanh thu cước dịch vụ vận chuyển"
+    columns:
+      - name: shipment_id
+        description: "Mã vận đơn"
+        tests:
+          - not_null
+      - name: customer_id
+        description: "Khóa ngoại tới dim_customer"
+        tests:
+          - not_null
+      - name: service_id
+        description: "Khóa ngoại tới dim_service"
+        tests:
+          - not_null
+      - name: revenue_amount
+        description: "Doanh thu tiền cước (VNĐ)"
+        tests:
+          - not_null
+
   - name: fact_delivery_remuneration
+    description: "Fact Table Thù lao công phát chi trả cho bưu cục đích"
+    columns:
+      - name: shipment_id
+        description: "Mã vận đơn"
+        tests:
+          - not_null
+      - name: delivery_pos_id
+        description: "Khóa ngoại tới dim_pos_location (bưu cục phát)"
+        tests:
+          - not_null
+      - name: delivery_fee
+        description: "Chi phí thù lao công phát"
+        tests:
+          - not_null
