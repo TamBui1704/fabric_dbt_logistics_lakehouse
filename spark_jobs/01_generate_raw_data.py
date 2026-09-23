@@ -43,7 +43,7 @@ def main():
         .drop("dummy") \
         .repartition(32) \
         .withColumn("row_id", expr("monotonically_increasing_id()")) \
-        .withColumn("id_str", lpad(col("row_id").cast("string"), 10, "0"))
+        .withColumn("id_str", lpad(col("row_id").cast("string"), 16, "0"))
 
     customers_expr = "CASE WHEN rand() < 0.3 THEN 'CUST_001' WHEN rand() < 0.6 THEN 'CUST_002' WHEN rand() < 0.8 THEN 'CUST_003' ELSE 'CUST_004' END"
     services_expr = "CASE WHEN rand() < 0.5 THEN 'SRV_EMS' WHEN rand() < 0.8 THEN 'SRV_STD' ELSE 'SRV_EXP' END"

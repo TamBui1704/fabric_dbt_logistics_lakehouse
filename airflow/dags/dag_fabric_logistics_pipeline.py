@@ -1,19 +1,22 @@
 from airflow import DAG
 from airflow.providers.microsoft.fabric.operators.run_item import MSFabricRunJobOperator
 from airflow.operators.bash import BashOperator
-from datetime import datetime
+import pendulum
 import os
 
-# Thay thế bằng ID thực tế bạn lấy từ URL trong Fabric
+# Cấu hình múi giờ Việt Nam (UTC+7)
+local_tz = pendulum.timezone("Asia/Ho_Chi_Minh")
+
+# Lấy ID trực tiếp từ biến môi trường (Environment Variables)
 WORKSPACE_ID = os.getenv("FABRIC_WORKSPACE_ID", "your_workspace_id")
 BRONZE_SPARK_JOB_ID = os.getenv("FABRIC_BRONZE_SPARK_JOB_ID", "your_bronze_job_id")
 SILVER_SPARK_JOB_ID = os.getenv("FABRIC_SILVER_SPARK_JOB_ID", "your_silver_job_id")
 
 with DAG(
     dag_id="fabric_logistics_medallion_pipeline",
-    start_date=datetime(2026, 9, 21),
-    schedule_interval="@daily",
-    catchup=False,
+    start_date=pendulum.datetime(2026, 1, 1, tz=local_tz),
+    schedule_interval="0 5 * * *",  # Tự động chạy đúng 5:00 AM hàng ngày (giờ VN)
+    catchup=False,                   # KHÔNG chạy bù các ngày trong quá khứ
     tags=["fabric", "spark", "dbt", "etl"]
 ) as dag:
 
@@ -40,11 +43,13 @@ with DAG(
     )
 
     # 3. Chạy dbt-fabric để transform dữ liệu (Gold)
-    # Giả định dbt project đã được cấu hình trong image Airflow hoặc mount volume
-    dbt_project_dir = "/opt/airflow/dags/repo/dbt_project" # Đường dẫn thực tế tùy môi trường
-    run_dbt_gold = BashOperator(
-        task_id="run_dbt_silver_to_gold",
-        bash_command=f"cd {dbt_project_dir} && dbt build --target prod --profiles-dir .",
-    )
+    # (Tạm comment, khi nào bật Fabric API thì bỏ comment dấu # để dùng)
+    # dbt_project_dir = "/opt/airflow/dags/repo/dbt_project"
+    # run_dbt_gold = BashOperator(
+    #     task_id="run_dbt_silver_to_gold",
+    #     bash_command=f"cd {dbt_project_dir} && dbt build --target prod --profiles-dir .",
+    # )
 
-    run_bronze_job >> run_silver_job >> run_dbt_gold
+    # Điều phối thứ tự:
+    # Nếu chạy cả dbt: run_bronze_job >> run_silver_job >> run_dbt_gold
+    run_bronze_job >> run_silver_job
