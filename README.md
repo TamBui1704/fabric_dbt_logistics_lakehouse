@@ -192,6 +192,7 @@ dbt docs serve --project-dir dbt_project --profiles-dir dbt_project
     - `02_bronze_to_silver.ipynb`: Xử lý làm sạch và chuẩn hóa vào tầng Silver.
     - `03_run_dbt_gold.ipynb`: Thử nghiệm kích hoạt dbt từ notebook.
     - `04_parse_dbt_run_results.ipynb`: Đọc `run_results.json` để ghi audit log vào Delta Table.
+    - `05_demo_delta_merge_into.ipynb`: Demo trực quan cơ chế `MERGE INTO`, kiểm tra `_delta_log` và Time Travel (`versionAsOf`).
 *   **Vận hành tự động qua Airflow:** 
     - Đẩy code từ `spark_jobs/` lên Fabric tạo thành các **Spark Job Definitions**.
     - Sử dụng DAG [airflow/dags/dag_fabric_logistics_pipeline.py](file:///c:/Users/buith/OneDrive/Desktop/fabric_dbt_logistics_lakehouse/airflow/dags/dag_fabric_logistics_pipeline.py) trên **Fabric Managed Airflow** để điều phối trọn vẹn luồng dữ liệu tự động hàng ngày: `Bronze (Spark) ➔ Silver (Spark) ➔ Gold (dbt)`.
