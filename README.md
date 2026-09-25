@@ -193,6 +193,9 @@ dbt docs serve --project-dir dbt_project --profiles-dir dbt_project
     - `03_run_dbt_gold.ipynb`: Thử nghiệm kích hoạt dbt từ notebook.
     - `04_parse_dbt_run_results.ipynb`: Đọc `run_results.json` để ghi audit log vào Delta Table.
     - `05_demo_delta_merge_into.ipynb`: Demo trực quan cơ chế `MERGE INTO`, kiểm tra `_delta_log` và Time Travel (`versionAsOf`).
+    - `06_oracle_cdc_merge_value_history.ipynb`: Quản lý mốc nạp (Watermark Pattern), đồng bộ song song Bảng Value (SCD1) và Bảng History (SCD2/Temporal).
+    - `07_silver_to_gold_clickhouse_incremental.ipynb`: Kiến trúc Star Schema Gold, Incremental Load với `_ingest_at`, và nạp dữ liệu PySpark vào ClickHouse Serving Layer (ReplacingMergeTree).
+    - `08_spark_optimization_deep_dive.ipynb`: Chuyên đề tối ưu hóa Spark & Delta Lake (Broadcast Join, AQE, Salting Data Skew, Coalesce vs Repartition, Optimize Z-Order, Vacuum).
 *   **Vận hành tự động qua Airflow:** 
     - Đẩy code từ `spark_jobs/` lên Fabric tạo thành các **Spark Job Definitions**.
     - Sử dụng DAG [airflow/dags/dag_fabric_logistics_pipeline.py](file:///c:/Users/buith/OneDrive/Desktop/fabric_dbt_logistics_lakehouse/airflow/dags/dag_fabric_logistics_pipeline.py) trên **Fabric Managed Airflow** để điều phối trọn vẹn luồng dữ liệu tự động hàng ngày: `Bronze (Spark) ➔ Silver (Spark) ➔ Gold (dbt)`.
