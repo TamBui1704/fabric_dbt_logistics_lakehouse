@@ -198,6 +198,7 @@ dbt docs serve --project-dir dbt_project --profiles-dir dbt_project
     - `08_spark_optimization_deep_dive.ipynb`: Chuyên đề tối ưu hóa Spark & Delta Lake (Broadcast Join, AQE, Salting Data Skew, Coalesce vs Repartition, Optimize Z-Order, Vacuum).
     - `09_schema_drift_resilience_pattern.ipynb`: Kiến trúc phòng thủ chống vỡ Schema (Schema Drift Resilience) khi Oracle CDC / Kafka đổi cột bất ngờ (Dead-Letter Queue, Delta AutoMerge, Permissive JSON).
     - `10_cdc_hard_delete_handling.ipynb`: Xử lý sự kiện Xóa vật lý (Hard Delete / `op = 'd'`) từ Oracle CDC vào Lakehouse (Soft Delete vs Hard Delete vs Gold Star Schema).
+    - `11_delta_change_data_feed_demo.ipynb`: Demo thực hành Delta Lake Change Data Feed (CDF) trên Fabric (Track row-level INSERT/UPDATE/DELETE changes, table_changes, Audit log, Streaming feed).
 *   **Vận hành tự động qua Airflow:** 
     - Đẩy code từ `spark_jobs/` lên Fabric tạo thành các **Spark Job Definitions**.
     - Sử dụng DAG [airflow/dags/dag_fabric_logistics_pipeline.py](file:///c:/Users/buith/OneDrive/Desktop/fabric_dbt_logistics_lakehouse/airflow/dags/dag_fabric_logistics_pipeline.py) trên **Fabric Managed Airflow** để điều phối trọn vẹn luồng dữ liệu tự động hàng ngày: `Bronze (Spark) ➔ Silver (Spark) ➔ Gold (dbt)`.
