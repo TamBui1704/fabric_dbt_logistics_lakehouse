@@ -1,0 +1,4 @@
+service_id,service_category,max_delivery_hours,penalty_rate
+SERV_EXPRESS,Hỏa Tốc,24,0.15
+SERV_STANDARD,Tiêu Chuẩn,72,0.05
+SERV_SAVING,Tiết Kiệm,120,0.02

@@ -1,6 +1,7 @@
 {{ config(
     materialized='incremental',
-    unique_key='shipment_id'
+    unique_key='shipment_id',
+    tags = ['daily', 'finance']
 ) }}
 
 SELECT
